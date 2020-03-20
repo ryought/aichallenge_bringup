@@ -2,5 +2,5 @@
 <launch>
     <arg name="scenario"/>
     <arg name="filename" default="$(find aichallenge_bringup)/data/$(arg scenario).bag"/>
-    <node pkg="rosbag" type="play" name="player" output="screen" args="--clock $(arg filename)" launch-prefix="bash -c 'sleep 10; echo $(arg scenario) start; $0 $@'" />
+    <node pkg="rosbag" type="play" name="player" output="screen" args="-q -k $(arg filename)" launch-prefix="bash -c 'sleep 10; echo $(arg scenario) start; $0 $@'" />
 </launch>
