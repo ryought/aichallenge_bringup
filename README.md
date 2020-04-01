@@ -56,6 +56,8 @@ rviz
 ```
 ![画面](/image/rviz.png)
 
+rvizのGUIが表示されたら左上のFileからOpen Configを選択し、aichallenge_bringupパッケージのdataの中にあるaichallenge.rvizを選ぶ。
+
 ## シナリオを実行して点数を算出する
 ### LGSVL Simulator Python APIのセットアップ
 https://github.com/lgsvl/PythonAPI
@@ -86,3 +88,86 @@ roscd aichallnge_bringup/scenario
 python3 traffic_light.py
 ```
 スコアは/traffic_light/scoreトピックにstd_msgs/Float32で配信される
+
+### 車両の制御コマンド
+車両にはautoware_msgs/VehicleCmd型で制御コマンドを送ることができます。
+本コンテストにおいてサポートしているコマンドはVehicleCmdの中のcontrol_cmd内部に存在するlinear_acceleration,steering_angleとなります。
+また、gearの値は必ず64（ドライブ）に設定してください。
+本コンテストのタスクにはバック走行が無いためバックギアはサポートいたしません。
+
+
+```
+std_msgs/Header header
+  uint32 seq
+  time stamp
+  string frame_id
+autoware_msgs/SteerCmd steer_cmd
+  std_msgs/Header header
+    uint32 seq
+    time stamp
+    string frame_id
+  int32 steer
+autoware_msgs/AccelCmd accel_cmd
+  std_msgs/Header header
+    uint32 seq
+    time stamp
+    string frame_id
+  int32 accel
+autoware_msgs/BrakeCmd brake_cmd
+  std_msgs/Header header
+    uint32 seq
+    time stamp
+    string frame_id
+  int32 brake
+autoware_msgs/LampCmd lamp_cmd
+  std_msgs/Header header
+    uint32 seq
+    time stamp
+    string frame_id
+  int32 l
+  int32 r
+int32 gear
+int32 mode
+geometry_msgs/TwistStamped twist_cmd
+  std_msgs/Header header
+    uint32 seq
+    time stamp
+    string frame_id
+  geometry_msgs/Twist twist
+    geometry_msgs/Vector3 linear
+      float64 x
+      float64 y
+      float64 z
+    geometry_msgs/Vector3 angular
+      float64 x
+      float64 y
+      float64 z
+autoware_msgs/ControlCommand ctrl_cmd
+  float64 linear_velocity
+  float64 linear_acceleration
+  float64 steering_angle
+int32 emergency
+```
+
+# オンライン評価環境におけるlaunch手順ならびそのサンプル
+
+オンライン評価環境においては以下の手順とコマンドにより評価を行います。
+
+1. シミュレータの起動
+
+本READMEに記述された手順と同様にしてシミュレータをAPIモードで起動します。
+
+2. シナリオスクリプトの実行
+```
+python3 (シナリオ名)_eval.py
+```
+
+このとき再生されるシナリオは本パッケージのscenarioディレクトリの中にあるpythonスクリプトに若干の修正（自車両の初速や、他車との相対的な位置関係等）を入れたものとなります。  
+ただし、初期姿勢に関してはサンプルシナリオと全く同じ値となっております。
+
+3. Autoware並びに参加者の皆様のノードの起動
+```
+roslaunch aichallenge_bringup aichallenge_bringup.launch acc:=(true or false) avoid:=(true or false) traffic_light:=(true or false)
+```
+
+上記のコマンドを用いてシナリオごとに参加者の皆様が作成されたlaunchファイルを呼び出し、評価を行います。

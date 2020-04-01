@@ -1,6 +1,25 @@
 <?xml version="1.0"?>
 <launch>
     <arg name="scenario"/>
-    <arg name="filename" default="$(find aichallenge_bringup)/data/$(arg scenario).bag"/>
-    <node pkg="rosbag" type="play" name="player" output="screen" args="-q -k $(arg filename)" launch-prefix="bash -c 'sleep 10; echo $(arg scenario) start; $0 $@'" />
+
+    <arg name="acc" default="false"/>
+    <arg name="avoid" default="false"/>
+    <arg name="traffic_light" default="false"/>
+
+    <group if="$(arg acc)">
+        <!-- ToDo : add ROS nodes developed by you -->
+      <arg name="filename" default="$(find aichallenge_bringup)/data/acc.bag"/>
+      <node pkg="rosbag" type="play" name="player" output="screen" args="-q -k $(arg filename)" launch-prefix="bash -c 'sleep 10; echo $(arg scenario) start; $0 $@'" />
+    </group>
+
+    <group if="$(arg avoid)">
+      <arg name="filename" default="$(find aichallenge_bringup)/data/avoid.bag"/>
+      <node pkg="rosbag" type="play" name="player" output="screen" args="-q -k $(arg filename)" launch-prefix="bash -c 'sleep 10; echo $(arg scenario) start; $0 $@'" />
+    </group>
+
+    <group if="$(arg traffic_light)">
+        <!-- ToDo : add ROS nodes developed by you -->
+      <arg name="filename" default="$(find aichallenge_bringup)/data/traffic_light.bag"/>
+      <node pkg="rosbag" type="play" name="player" output="screen" args="-q -k $(arg filename)" launch-prefix="bash -c 'sleep 10; echo $(arg scenario) start; $0 $@'" />
+    </group>
 </launch>
